@@ -30,7 +30,7 @@ observing prova stats map[fatal:1 notice:1877 warning:1]
 ```
   - job_name: 'phperrorlog-exporter'
     scrape_interval: 30m
-    scrape_timeout: 30m
+    scrape_timeout: 30s
     metrics_path: /metrics
     static_configs:
     - targets:
