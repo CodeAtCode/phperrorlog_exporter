@@ -2,6 +2,7 @@
 
 Prometheus php error log exporter, watches php error logs end exports metrics to prometheus.  
 Based on [foomo/phperrorlog_exporter](https://github.com/foomo/phperrorlog_exporter), updated to latest Go version and dependence with a better logging and readme.
+Grafana dashboard sample available [there](https://grafana.com/grafana/dashboards/14368).
 
 ## Compile
 
