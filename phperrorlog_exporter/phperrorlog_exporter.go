@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/CodeAtCode/phperrorlog_exporter/logparser"
+	"github.com/foomo/phperrorlog_exporter/logparser"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -37,8 +37,8 @@ func main() {
 		go logparser.Observe(parts[0], parts[1], chanObservation, time.Second*10)
 	}
 
-	phpErrors := prometheus.NewCounterVec(
-		prometheus.CounterOpts{
+	phpErrors := prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
 			Name: "php_errors",
 			Help: "How many PHP errors partitioned by type and site",
 		},
@@ -58,9 +58,8 @@ func main() {
 		select {
 		case observation := <-chanObservation:
 			fmt.Println("observing", observation.Name, "stats", observation.Stats)
-            phpErrors.Reset()
 			for t, v := range observation.Stats {
-				phpErrors.WithLabelValues(t, observation.Name).Add(float64(v))
+				phpErrors.WithLabelValues(t, observation.Name).Observe(float64(v))
 			}
 		}
 	}
