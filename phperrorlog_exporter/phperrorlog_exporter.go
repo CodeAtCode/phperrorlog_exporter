@@ -8,15 +8,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/phperrorlog_exporter/logparser"
+	"github.com/CodeAtCode/phperrorlog_exporter/logparser"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
-	flagHTTP := flag.String("http", "", "expose metrics ip:port")
+	flagHTTP := flag.String("http", ":9423", "Address to listen on for web interface.")
 	flag.Parse()
 	usage := func() {
-		fmt.Println("Usage:", os.Args[0], "name:path/to/php/error.log [name:path/to/other/log]")
+		fmt.Println("Usage:", os.Args[0], "domain:path/to/php/error.log [domain:path/to/other/log]")
 		flag.PrintDefaults()
 		os.Exit(1)
 
@@ -47,9 +48,10 @@ func main() {
 
 	if len(*flagHTTP) > 0 {
 		go func() {
-			http.Handle("/metrics", prometheus.Handler())
+			http.Handle("/metrics", promhttp.Handler())
 			http.ListenAndServe(*flagHTTP, nil)
 		}()
+        fmt.Println("Listening on address:port => ", *flagHTTP)
 	}
 
 	for {
@@ -57,7 +59,7 @@ func main() {
 		case observation := <-chanObservation:
 			fmt.Println("observing", observation.Name, "stats", observation.Stats)
 			for t, v := range observation.Stats {
-				phpErrors.WithLabelValues(t, observation.Name).Set(float64(v))
+				phpErrors.WithLabelValues(t, observation.Name).Add(float64(v))
 			}
 		}
 	}
