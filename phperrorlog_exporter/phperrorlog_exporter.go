@@ -58,6 +58,7 @@ func main() {
 		select {
 		case observation := <-chanObservation:
 			fmt.Println("observing", observation.Name, "stats", observation.Stats)
+            phpErrors.Reset()
 			for t, v := range observation.Stats {
 				phpErrors.WithLabelValues(t, observation.Name).Add(float64(v))
 			}
