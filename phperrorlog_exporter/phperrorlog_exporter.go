@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/foomo/phperrorlog_exporter/logparser"
+	"github.com/CodeAtCode/phperrorlog_exporter/logparser"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -37,10 +37,12 @@ func main() {
 		go logparser.Observe(parts[0], parts[1], chanObservation, time.Second*10)
 	}
 
-	phpErrors := prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
+	phpErrors := prometheus.NewSummaryVec(
+		prometheus.SummaryOpts{
 			Name: "php_errors",
 			Help: "How many PHP errors partitioned by type and site",
+            MaxAge: 100,
+            AgeBuckets: 1,
 		},
 		[]string{"type", "site"},
 	)
